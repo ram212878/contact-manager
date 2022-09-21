@@ -102,20 +102,13 @@ class _AddUserState extends State<AddUser> {
                         });
                         if (_validateName == false &&
                             _validateContact == false) {
-                         // print("Good Data Can Save");
+                          // print("Good Data Can Save");
 
                           _user.name = _userNameController.text;
                           _user.contact = _userContactController.text;
-                          if(_imageFile==null) {
-                            final ByteData bytes = await rootBundle.load(
-                                'assets/images/profile.jpg');
-                            String imgString = Utility.base64String(bytes.buffer
-                                .asUint8List());
-                            _user.image=imgString;
-                          }
 
-                          var result=await _userService.SaveUser(_user);
-                         Navigator.pop(context,result);
+                          var result = await _userService.SaveUser(_user);
+                            Navigator.pop(context, result);
                         }
                       },
                       child: const Text('Save Details')),
@@ -147,8 +140,8 @@ class _AddUserState extends State<AddUser> {
         children: [
           CircleAvatar(
             radius: 60.0,
-            backgroundImage:_imageFile==null?
-            const AssetImage("assets/images/profile.jpg"):FileImage(File(_imageFile!.path)) as ImageProvider,
+            backgroundImage:_imageFile==null ?
+            const AssetImage("assets/images/profile.jpg"):Image.file(File(_imageFile!.path)).image ,
 
           ),
           Positioned(
@@ -187,15 +180,15 @@ class _AddUserState extends State<AddUser> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               GestureDetector(
-                child: const Icon(Icons.camera_alt_outlined, semanticLabel: "Camera",),
+                child: const Icon(size: 50.0,Icons.camera_alt_outlined,),
                 onTap: (){
-                  getImage(ImageSource.camera);
+                  getImage("camera");
                 },
               ),
               GestureDetector(
-                child: const Icon(Icons.image, semanticLabel: "Gallery",),
+                child: const Icon(size:50.0,Icons.image,),
                 onTap: (){
-                  getImage(ImageSource.gallery);
+                  getImage("gallery");
                   },
               )
             ],
@@ -205,10 +198,17 @@ class _AddUserState extends State<AddUser> {
     );
   }
 
-  void getImage(ImageSource source) async{
-     var pickedFile = await _picker.pickImage(source: source);
+  void getImage(String src) async{
+    ImageSource source;
+
+    src=="camera"? source=ImageSource.camera : source = ImageSource.gallery ;
+
+    var pickedFile = await _picker.pickImage(source: source);
      imageFile = File(pickedFile!.path);
+
+     //base64 image
      String imgString = Utility.base64String(imageFile.readAsBytesSync());
+
      debugPrint("ImageFile = ${imageFile.toString()}");
      debugPrint("is imageFile null : ${imageFile==null}");
      if(imageFile==null){
